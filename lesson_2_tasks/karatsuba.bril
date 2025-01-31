@@ -1,7 +1,8 @@
-# ARGS = 200, 1500
-# Utilizes the @mod function and a modified version of the @bitwise_or found in 
-# adler32 benchmark. Also uses the leftshift and (modified) rightshift (+pow) from 
+# Utilizes the mod function and a modified version of the bitwise_or found in 
+# adler32 benchmark. Also uses the leftshift, rightshift, and pow from 
 # the bitshift benchmark
+
+# ARGS: 123456789 57648
 
 # Calculate the modulo of the two numbers using arithmetic
 @mod(r: int, s: int): int {
@@ -104,64 +105,66 @@
 
 # Calculates the number of bits in a
 @calc_size(a: int): int {
-  zero : int = const 0;
-  one : int = const 1;
-  result : int = const 0;
-  cond : bool = gt a zero;
+  zero: int = const 0;
+  one: int = const 1;
+  result: int = const 0;
   .check: 
+    cond: bool = gt a zero;
     br cond .loop .end;
   .loop:
-    a = call @RIGHTSHIFT a one;
-    result = add result one;
+    a: int = call @RIGHTSHIFT a one;
+    result: int = add result one;
     jmp .check;
   .end:
     ret result;
 }
 
 @karatsuba(a:int, b:int):int {
-  two : int = const 2;
-  cond :bool = lt a two or lt b two;
+  two: int = const 2;
+  b1: bool = lt a two;
+  b2: bool = lt b two;
+  cond: bool = or b1 b2;
   br cond .base_case .recursive;
-  all_ones : int = -1;
-  almost_all_ones : int = 18446744073709551615;
   .recursive:
-    size_a : int = call @calc_size a;
-    size_b : int = call @calc_size b;
-    split : int = const 0;
-    condd : bool = ge a b;
+    size_a: int = call @calc_size a;
+    size_b: int = call @calc_size b;
+    condd: bool = ge a b;
     br condd .a_greater .b_greater;
     .a_greater:
-      split = div size_a two;
-      jmp .cont
+      split: int = div size_a two;
+      jmp .cont;
     .b_greater:
-      split = div size_b two;
+      split: int = div size_b two;
     .cont: 
-      high_mask : int = call @LEFTSHIFT all_ones split;
-      sixthree : int = const 63;
-      shift_amt : int = sub sixthree split;
-      low_mask : int = call @RIGHTSHIFT almost_all_ones shift_amt;
-      a_high : int = call @bitwise_and a high_mask;
-      b_high : int = call @bitwise_and b high_mask;
-      a_low : int = call @bitwise_and a low_mask;
-      b_low : int = call @bitwise_and b low_mask;
-      z0 : int = call @karatsuba(a_low, b_low);
-      a_plus : int = add a_high a_low;
-      b_plus : int = add b_high b_low;
-      z1 : int = call @karatsuba(a_plus, b_plus);
-      z2 : int = call @karatsuba(a_high, b_high);
-      pow_one : int = mul split two'
+      one: int = const 1;
+      all_ones: int = const -1;
+      high_mask: int = call @LEFTSHIFT all_ones split; 
+      temp_mask: int = call @pow two split;
+      low_mask: int = sub temp_mask one;
+      a_high: int = call @RIGHTSHIFT a split;
+      b_high: int = call @RIGHTSHIFT b split;
+      a_low: int = call @bitwise_and a low_mask;
+      b_low: int = call @bitwise_and b low_mask;
+      z0: int = call @karatsuba a_low b_low;
+      a_plus: int = add a_high a_low;
+      b_plus: int = add b_high b_low;
+      z1: int = call @karatsuba a_plus b_plus;
+      z2: int = call @karatsuba a_high b_high;
+      pow_one: int = mul split two;
       first_term : int = call @LEFTSHIFT z2 pow_one;
-      temp : int = sub z1 z2;
-      temp = sub temp z0;
+      temp: int = sub z1 z2;
+      temp: int = sub temp z0;
       second_term : int = call @LEFTSHIFT temp split;
-      temp = add first_term second_term;
-      ret add temp z0;
+      temp: int = add first_term second_term;
+      final: int = add temp z0;
+      ret final;
 
   .base_case:
-    ret mul a b;
+    final: int = mul a b;
+    ret final;
 }
 
-@main(a:int, b:int) {
-  res : int = karatsuba(a ,b);
+@main(a: int, b:int) {
+  res: int = call @karatsuba a b;
   print res;
 }

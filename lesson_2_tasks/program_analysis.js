@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // print variables that are not used after creation
-var add_json_1 = __importDefault(require("./add.json"));
+var contrived_cfg_json_1 = __importDefault(require("./contrived_cfg.json"));
 var Block = /** @class */ (function () {
     function Block() {
     }
@@ -17,30 +17,32 @@ function main() {
     var blocks = [];
     var current_block = [];
     // iterate over program - collect blocks and count variable usage
-    add_json_1.default.functions.forEach(function (func) {
+    contrived_cfg_json_1.default.functions.forEach(function (func) {
         func.instrs.forEach(function (insn) {
             if (is_term(insn)) {
                 current_block.push(insn);
                 var to_push = new Block();
+                console.log("term block: " + current_block.length);
                 to_push.insns = JSON.parse(JSON.stringify(current_block));
                 blocks.push(to_push);
                 current_block = [];
             }
-            else if ("label" in insn) { // end the previous block, add to new one - LABEL IS ALWAYS FIRST INSTRUCTION
-                var to_push = new Block();
-                to_push.insns = JSON.parse(JSON.stringify(current_block));
-                blocks.push(to_push);
-                current_block = [];
+            else if ("label" in insn) { // end the previous block - if there is one, add to new one - LABEL IS ALWAYS FIRST INSTRUCTION
+                if (current_block.length > 0) {
+                    var to_push = new Block();
+                    to_push.insns = JSON.parse(JSON.stringify(current_block));
+                    console.log("label block: " + current_block.length);
+                    blocks.push(to_push);
+                    current_block = [];
+                }
                 current_block.push(insn);
             }
             else {
                 if ("dest" in insn) {
-                    console.log("has dest");
                     var curr = vars_count.has(insn.dest) ? vars_count.get(insn.dest) + 1 : 1;
                     vars_count.set(insn.dest, curr);
                 }
                 if ("args" in insn) { // this checks it exists so it must exist
-                    console.log("has args");
                     insn.args.forEach(function (arg) {
                         var curr = vars_count.has(arg) ? vars_count.get(arg) + 1 : 1;
                         vars_count.set(arg, curr);
@@ -49,6 +51,12 @@ function main() {
                 current_block.push(insn);
             }
         });
+        //push last block in function:
+        var to_push = new Block();
+        console.log("last block: " + current_block.length);
+        to_push.insns = JSON.parse(JSON.stringify(current_block));
+        blocks.push(to_push);
+        current_block = [];
     });
     // iterate over blocks and collect labels
     blocks.forEach(function (block) {
@@ -84,9 +92,29 @@ function main() {
         var p = val - 1; //creating it doesn't count as a use
         console.log(key + ":" + p);
     });
+    console.log("cfg graph: ");
+    for (var i = 0; i < blocks.length; i++) {
+        successors = cfg[i];
+        console.log("block: \n" + block_to_string(blocks[i]) + "has successors: \n");
+        successors.forEach(function (block) {
+            console.log(block_to_string(block));
+        });
+    }
 }
 function block_to_string(block) {
     var result = "";
+    block.insns.forEach(function (instr) {
+        if ("label" in instr) {
+            result = result + instr.label + "\n";
+        }
+        else {
+            result = result + instr.op;
+            if ("labels" in instr) {
+                result = result + instr.labels.toString();
+            }
+            result = result + "\n";
+        }
+    });
     return result;
 }
 function is_term(insn) {
