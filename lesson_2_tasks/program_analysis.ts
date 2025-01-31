@@ -1,3 +1,5 @@
+/// <reference lib="es2020" />
+
 // print variables that are not used after creation
 import program from "./add.json"
 
@@ -9,15 +11,15 @@ type NonTermEffect = {
   args?: string[],
   type?: Type,
 }
-type ConstOrValue = {
+type Others = {
   op: string,
-  dest: string,
+  dest?: string,
   args?: string[],
   value?: number,
   type?: Type,
   funcs?: string[]
 }
-type Instruction = ConstOrValue | NonTermEffect | Label | TermInsn
+type Instruction = Others | Label | TermInsn
 type Param = {
   name: string,
   type: Type
@@ -58,12 +60,15 @@ function main() {
       }
       else {
         if ("dest" in insn) {
-          if (vars_count.has(insn.dest)) {
-            var curr = vars_count.has(insn.dest) ? vars_count.get(insn.dest)! + 1 : 1
-            vars_count.set(insn.dest, curr)
-          }
+          console.log("has dest")
+
+          var curr = vars_count.has(insn.dest!) ? vars_count.get(insn.dest!)! + 1 : 1
+          vars_count.set(insn.dest!, curr)
+
         }
         if ("args" in insn) { // this checks it exists so it must exist
+          console.log("has args")
+
           insn.args!.forEach((arg) => {
             var curr = vars_count.has(arg) ? vars_count.get(arg)! + 1 : 1
             vars_count.set(arg, curr)
@@ -105,6 +110,17 @@ function main() {
     cfg.push(JSON.parse(JSON.stringify(successors)))
   }
 
+  console.log("variable counts: ")
+  vars_count.forEach((val: number, key: string) => {
+    var p = val - 1 //creating it doesn't count as a use
+    console.log(key + ":" + p);
+  })
+
+}
+
+function block_to_string(block: Block) {
+  var result = ""
+  return result
 }
 
 function is_term(insn: Instruction) {

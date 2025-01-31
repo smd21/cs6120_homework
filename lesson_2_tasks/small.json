@@ -19,21 +19,6 @@
           "op": "const",
           "type": "int",
           "value": 12
-        },
-        {
-          "args": [
-            "v0",
-            "v1"
-          ],
-          "dest": "v2",
-          "op": "add",
-          "type": "int"
-        },
-        {
-          "args": [
-            "v2"
-          ],
-          "op": "print"
         }
       ],
       "name": "main"
