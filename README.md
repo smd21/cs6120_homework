@@ -2,7 +2,9 @@
 
 Lesson 2 tasks: Create a new benchmark for Bril + make a small program to analyze/transform Bril programs.
 
-Some background: Last semester I took 4414 and the final assignment was to implement basic math functions for large integers represented as arrays (1 digit per index). I had a small bug early on that resulted in a massive headache towards the end of the assignment. I am really not proud of the work I did (I ran out of time and had to cobble something working together), so I decided to take revenge on the assignment and re-implement a piece of it as my benchmark for Bril. 
+To running lesson_2_tasks/program_analysis.ts : need resolveJsonModule and esModuleInterop flags in command
 
-
-for running program_analysis: need resolveJsonModule and esModuleInterop flags in command
+Lesson 3 tasks: Implement trivial dead code elimination and local value numbering.
+Apparently I basically did the first part in my lesson 2 implementation lolz
+did in typescript since i've been mainly working in TS the past few weeks, probably
+switching for next task though (i just really didn't feel like setting anything else up)

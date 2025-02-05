@@ -1,0 +1,133 @@
+{
+  "functions": [
+    {
+      "instrs": [
+        {
+          "dest": "v0",
+          "op": "const",
+          "type": "int",
+          "value": 1
+        },
+        {
+          "dest": "v1",
+          "op": "const",
+          "type": "int",
+          "value": 2
+        },
+        {
+          "dest": "v3",
+          "op": "const",
+          "type": "int",
+          "value": 12
+        },
+        {
+          "args": [
+            "v0",
+            "v1"
+          ],
+          "dest": "v2",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "args": [
+            "v2"
+          ],
+          "op": "print"
+        }
+      ],
+      "name": "main"
+    },
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "int"
+        }
+      ],
+      "instrs": [
+        {
+          "dest": "zero",
+          "op": "const",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "dest": "one",
+          "op": "const",
+          "type": "int",
+          "value": 1
+        },
+        {
+          "dest": "result",
+          "op": "const",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "label": "check"
+        },
+        {
+          "args": [
+            "a",
+            "zero"
+          ],
+          "dest": "cond",
+          "op": "gt",
+          "type": "bool"
+        },
+        {
+          "args": [
+            "cond"
+          ],
+          "labels": [
+            "loop",
+            "end"
+          ],
+          "op": "br"
+        },
+        {
+          "label": "loop"
+        },
+        {
+          "args": [
+            "a",
+            "one"
+          ],
+          "dest": "a",
+          "funcs": [
+            "RIGHTSHIFT"
+          ],
+          "op": "call",
+          "type": "int"
+        },
+        {
+          "args": [
+            "result",
+            "one"
+          ],
+          "dest": "result",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "labels": [
+            "check"
+          ],
+          "op": "jmp"
+        },
+        {
+          "label": "end"
+        },
+        {
+          "args": [
+            "result"
+          ],
+          "op": "ret"
+        }
+      ],
+      "name": "calc_size",
+      "type": "int"
+    }
+  ]
+}
