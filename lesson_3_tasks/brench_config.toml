@@ -1,5 +1,5 @@
 extract = 'total_dyn_inst: (\d+)'
-benchmarks = '../benchmarks/*.bril' change this
+benchmarks = '~/bril/benchmarks/*.bril'
 
 [runs.baseline]
 pipeline = [
@@ -7,9 +7,9 @@ pipeline = [
     "brili -p {args}",
 ]
 
-[runs.lvn]
+[runs.myopt]
 pipeline = [
     "bril2json",
-    "lvn", 
+    "node lvn.js",
     "brili -p {args}",
 ]

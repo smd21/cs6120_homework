@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // print variables that are not used after creation
-var test_optimization_json_1 = __importDefault(require("./test_optimization.json"));
+var test_optimization2_json_1 = __importDefault(require("./test_optimization2.json"));
 var Val_Tup = /** @class */ (function () {
     function Val_Tup() {
     }
@@ -23,7 +23,7 @@ var Block = /** @class */ (function () {
 }());
 function main() {
     // do optimization one function at a time
-    test_optimization_json_1.default.functions.forEach(function (func) {
+    test_optimization2_json_1.default.functions.forEach(function (func) {
         // collect function blocks
         var blocks = build_blocks(func);
         // apply llvn and renaming
@@ -33,7 +33,7 @@ function main() {
         // assign optimized blocks to function
         func.instrs = flatten_blocks(new_blocks);
     });
-    var result = JSON.stringify(test_optimization_json_1.default);
+    var result = JSON.stringify(test_optimization2_json_1.default);
     console.log(result);
 }
 function flatten_blocks(blocks) {
@@ -135,6 +135,16 @@ function do_llvn(blocks) {
                     vartorow.set(row.variable, table_idx);
                     valtorow.set(val_map_key, table_idx);
                     table_idx++;
+                }
+            }
+            else { // no dest - so like break, print, jmp, etc
+                if ("args" in insn) {
+                    var new_args = [];
+                    // canonicalize arg names
+                    insn.args.forEach(function (arg) {
+                        new_args.push(table[vartorow.get(arg)].variable);
+                    });
+                    new_insn.args = new_args;
                 }
             }
             new_insns.push(new_insn);

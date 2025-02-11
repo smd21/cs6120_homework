@@ -1,7 +1,7 @@
 /// <reference lib="es2020" />
 
 // print variables that are not used after creation
-import program from "./test_optimization.json"
+import program from "./test_optimization2.json"
 
 
 type Unk = string
@@ -170,6 +170,16 @@ function do_llvn(blocks: Block[]) {
           vartorow.set(row.variable, table_idx)
           valtorow.set(val_map_key, table_idx)
           table_idx++
+        }
+      }
+      else { // no dest - so like break, print, jmp, etc
+        if ("args" in insn) {
+          var new_args: string[] = []
+          // canonicalize arg names
+          insn.args!.forEach((arg) => {
+            new_args.push(table[vartorow.get(arg)!].variable)
+          });
+          (new_insn as Others).args = new_args
         }
       }
       new_insns.push(new_insn);
