@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // print variables that are not used after creation
-var test_optimization2_json_1 = __importDefault(require("./test_optimization2.json"));
+var fs_1 = __importDefault(require("fs"));
+var test_json_1 = __importDefault(require("./test.json"));
 var Val_Tup = /** @class */ (function () {
     function Val_Tup() {
     }
@@ -23,7 +24,7 @@ var Block = /** @class */ (function () {
 }());
 function main() {
     // do optimization one function at a time
-    test_optimization2_json_1.default.functions.forEach(function (func) {
+    test_json_1.default.functions.forEach(function (func) {
         // collect function blocks
         var blocks = build_blocks(func);
         // apply llvn and renaming
@@ -33,7 +34,8 @@ function main() {
         // assign optimized blocks to function
         func.instrs = flatten_blocks(new_blocks);
     });
-    var result = JSON.stringify(test_optimization2_json_1.default);
+    var result = JSON.stringify(test_json_1.default);
+    fs_1.default.writeFileSync("out.json", result);
     console.log(result);
 }
 function flatten_blocks(blocks) {
@@ -119,10 +121,16 @@ function do_llvn(blocks) {
                     new_insn.dest = fresh; // update instruction to match
                 }
                 // check if value is already in table
-                if (valtorow.has(val_map_key)) { // this check doesn't work properly lol
+                if (valtorow.has(val_map_key) || (insn.op == "id" && vartorow.has(insn.args[0]))) {
                     console.log("138: val in table");
                     // if already in the table, add pointer to that row
-                    var r = valtorow.get(val_map_key);
+                    var r = -1;
+                    if (insn.op == "id") {
+                        r = vartorow.get(insn.args[0]);
+                    }
+                    else {
+                        r = valtorow.get(val_map_key);
+                    }
                     vartorow.set(row.variable, r);
                     // replace this instruction with dest = id var_in_table
                     new_insn.op = "id";

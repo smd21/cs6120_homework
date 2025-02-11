@@ -1,0 +1,1 @@
+{"functions":[{"args":[{"name":"a","type":"int"},{"name":"b","type":"int"}],"instrs":[{"dest":"sum1","op":"add","type":"int","args":["a","b"]},{"args":["sum1"],"op":"print"}],"name":"main"}]}

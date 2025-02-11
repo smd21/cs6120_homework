@@ -1,0 +1,50 @@
+{
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "a",
+          "type": "int"
+        },
+        {
+          "name": "b",
+          "type": "int"
+        }
+      ],
+      "instrs": [
+        {
+          "dest": "sum1",
+          "op": "add",
+          "type": "int",
+          "args": [
+            "a",
+            "b"
+          ]
+        },
+        {
+          "dest": "sum2",
+          "op": "id",
+          "type": "int",
+          "args": [
+            "sum1"
+          ]
+        },
+        {
+          "dest": "sum3",
+          "op": "id",
+          "type": "int",
+          "args": [
+            "sum2"
+          ]
+        },
+        {
+          "args": [
+            "sum2"
+          ],
+          "op": "print"
+        }
+      ],
+      "name": "main"
+    }
+  ]
+}

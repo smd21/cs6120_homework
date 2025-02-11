@@ -1,7 +1,8 @@
 /// <reference lib="es2020" />
 
 // print variables that are not used after creation
-import program from "./test_optimization2.json"
+import fs from 'fs';
+import program from "./test.json"
 
 
 type Unk = string
@@ -59,6 +60,7 @@ function main() {
     func.instrs = flatten_blocks(new_blocks)
   })
   var result = JSON.stringify(program)
+  fs.writeFileSync("out.json", result)
   console.log(result)
 }
 
@@ -153,10 +155,16 @@ function do_llvn(blocks: Block[]) {
         }
 
         // check if value is already in table
-        if (valtorow.has(val_map_key)) { // this check doesn't work properly lol
+        if (valtorow.has(val_map_key) || (insn.op == "id" && vartorow.has(insn.args![0]))) {
           console.log("138: val in table")
           // if already in the table, add pointer to that row
-          var r = valtorow.get(val_map_key)!
+          var r = -1
+          if (insn.op == "id") {
+            r = vartorow.get(insn.args![0])!
+          }
+          else {
+            r = valtorow.get(val_map_key)!
+          }
           vartorow.set(row.variable, r);
 
           // replace this instruction with dest = id var_in_table
