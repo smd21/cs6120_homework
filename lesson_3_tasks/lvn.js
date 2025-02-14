@@ -4,9 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// print variables that are not used after creation
-var fs_1 = __importDefault(require("fs"));
-var test_json_1 = __importDefault(require("./test.json"));
+var gcd_json_1 = __importDefault(require("./gcd.json"));
 var Val_Tup = /** @class */ (function () {
     function Val_Tup() {
     }
@@ -24,7 +22,7 @@ var Block = /** @class */ (function () {
 }());
 function main() {
     // do optimization one function at a time
-    test_json_1.default.functions.forEach(function (func) {
+    gcd_json_1.default.functions.forEach(function (func) {
         // collect function blocks
         var blocks = build_blocks(func);
         // apply llvn and renaming
@@ -34,8 +32,7 @@ function main() {
         // assign optimized blocks to function
         func.instrs = flatten_blocks(new_blocks);
     });
-    var result = JSON.stringify(test_json_1.default);
-    fs_1.default.writeFileSync("out.json", result);
+    var result = JSON.stringify(gcd_json_1.default);
     console.log(result);
 }
 function flatten_blocks(blocks) {
@@ -63,7 +60,7 @@ function do_llvn(blocks) {
                 var val;
                 var val_map_key = "";
                 if ("value" in insn) {
-                    console.log("value insn");
+                    //console.log("value insn")
                     val = insn.value;
                     val_map_key = insn.value.toString();
                 }
@@ -80,7 +77,7 @@ function do_llvn(blocks) {
                             table_idx++;
                         }
                         else { // canonicalize
-                            console.log("104: " + table[vartorow.get(arg)].variable + ": " + table[vartorow.get(arg)].val);
+                            //console.log("104: " + table[vartorow.get(arg)!].variable + ": " + table[vartorow.get(arg)!].val)
                             argis[idx] = table[vartorow.get(arg)].variable;
                         }
                     }, argis);
@@ -91,16 +88,16 @@ function do_llvn(blocks) {
                     if (argis.length == 2) {
                         arg2 = vartorow.get(argis[1]);
                     }
-                    console.log("arg1: " + arg1 + " arg2: " + arg2);
+                    //console.log("arg1: " + arg1 + " arg2: " + arg2);
                     // commutativity for add + mul. arrange in order of smaller row to larger row
                     if (op == "add" || op == "mul") {
-                        console.log("115: commutative");
+                        //console.log("115: commutative")
                         var smaller = arg1 < arg2 ? arg1 : arg2;
                         var larger = arg1 > arg2 ? arg1 : arg2;
-                        console.log("smaller: " + smaller + " larger: " + larger);
+                        //console.log("smaller: " + smaller + " larger: " + larger);
                         arg1 = smaller;
                         arg2 = larger;
-                        console.log("commurarive: arg1: " + arg1 + " arg2: " + arg2);
+                        //console.log("commurarive: arg1: " + arg1 + " arg2: " + arg2);
                     }
                     val = new Val_Tup();
                     val.op = op;
@@ -117,12 +114,12 @@ function do_llvn(blocks) {
                     var fresh = "freshvar" + fresh_vars;
                     fresh_vars++;
                     row.variable = fresh;
-                    console.log("132: fresh: " + fresh);
+                    //console.log("132: fresh: " + fresh);
                     new_insn.dest = fresh; // update instruction to match
                 }
                 // check if value is already in table
                 if (valtorow.has(val_map_key) || (insn.op == "id" && vartorow.has(insn.args[0]))) {
-                    console.log("138: val in table");
+                    //console.log("138: val in table")
                     // if already in the table, add pointer to that row
                     var r = -1;
                     if (insn.op == "id") {
@@ -138,7 +135,7 @@ function do_llvn(blocks) {
                 }
                 else {
                     // add to table and add val/var mappings
-                    console.log("149: added: " + row.variable + " to table idx " + table_idx);
+                    //console.log("149: added: " + row.variable + " to table idx " + table_idx);
                     table[table_idx] = row;
                     vartorow.set(row.variable, table_idx);
                     valtorow.set(val_map_key, table_idx);
@@ -159,6 +156,10 @@ function do_llvn(blocks) {
         });
         new_block.insns = new_insns;
         blocks[idx] = new_block;
+        table = [];
+        table_idx = 0;
+        vartorow = new Map();
+        valtorow = new Map();
     });
     return blocks;
 }

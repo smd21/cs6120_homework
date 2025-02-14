@@ -2,7 +2,7 @@
 
 // print variables that are not used after creation
 import fs from 'fs';
-import program from "./test.json"
+import program from "./gcd.json"
 
 
 type Unk = string
@@ -60,7 +60,6 @@ function main() {
     func.instrs = flatten_blocks(new_blocks)
   })
   var result = JSON.stringify(program)
-  fs.writeFileSync("out.json", result)
   console.log(result)
 }
 
@@ -79,8 +78,8 @@ function do_llvn(blocks: Block[]) {
   var vartorow: Map<string, number> = new Map()
   var valtorow: Map<string, number> = new Map()
 
-
   blocks.forEach((block, idx) => {
+
     // collect table 
     var new_block: Block = new Block()
     var new_insns: Instruction[] = []
@@ -93,7 +92,7 @@ function do_llvn(blocks: Block[]) {
         var val_map_key: string = ""
 
         if ("value" in insn) {
-          console.log("value insn")
+          //console.log("value insn")
           val = insn.value!
           val_map_key = insn.value!.toString()
         }
@@ -110,7 +109,7 @@ function do_llvn(blocks: Block[]) {
               table_idx++
             }
             else { // canonicalize
-              console.log("104: " + table[vartorow.get(arg)!].variable + ": " + table[vartorow.get(arg)!].val)
+              //console.log("104: " + table[vartorow.get(arg)!].variable + ": " + table[vartorow.get(arg)!].val)
               argis[idx] = table[vartorow.get(arg)!].variable
             }
           }, argis)
@@ -121,17 +120,17 @@ function do_llvn(blocks: Block[]) {
           if (argis.length == 2) {
             arg2 = vartorow.get(argis[1])!
           }
-          console.log("arg1: " + arg1 + " arg2: " + arg2);
+          //console.log("arg1: " + arg1 + " arg2: " + arg2);
 
           // commutativity for add + mul. arrange in order of smaller row to larger row
           if (op == "add" || op == "mul") {
-            console.log("115: commutative")
+            //console.log("115: commutative")
             var smaller = arg1 < arg2 ? arg1 : arg2
             var larger = arg1 > arg2 ? arg1 : arg2
-            console.log("smaller: " + smaller + " larger: " + larger);
+            //console.log("smaller: " + smaller + " larger: " + larger);
             arg1 = smaller
             arg2 = larger
-            console.log("commurarive: arg1: " + arg1 + " arg2: " + arg2);
+            //console.log("commurarive: arg1: " + arg1 + " arg2: " + arg2);
 
           }
 
@@ -150,13 +149,13 @@ function do_llvn(blocks: Block[]) {
           var fresh: string = "freshvar" + fresh_vars;
           fresh_vars++;
           row.variable = fresh;
-          console.log("132: fresh: " + fresh);
+          //console.log("132: fresh: " + fresh);
           (new_insn as Others).dest = fresh; // update instruction to match
         }
 
         // check if value is already in table
         if (valtorow.has(val_map_key) || (insn.op == "id" && vartorow.has(insn.args![0]))) {
-          console.log("138: val in table")
+          //console.log("138: val in table")
           // if already in the table, add pointer to that row
           var r = -1
           if (insn.op == "id") {
@@ -173,7 +172,7 @@ function do_llvn(blocks: Block[]) {
 
         } else {
           // add to table and add val/var mappings
-          console.log("149: added: " + row.variable + " to table idx " + table_idx);
+          //console.log("149: added: " + row.variable + " to table idx " + table_idx);
           table[table_idx] = row
           vartorow.set(row.variable, table_idx)
           valtorow.set(val_map_key, table_idx)
@@ -185,7 +184,7 @@ function do_llvn(blocks: Block[]) {
           var new_args: string[] = []
           // canonicalize arg names
           insn.args!.forEach((arg) => {
-            new_args.push(table[vartorow.get(arg)!].variable)
+            new_args.push(table[vartorow.get(arg)!].variable) //failing on this due to undefined - test more
           });
           (new_insn as Others).args = new_args
         }
@@ -194,6 +193,10 @@ function do_llvn(blocks: Block[]) {
     })
     new_block.insns = new_insns
     blocks[idx] = new_block;
+    table = []
+    table_idx = 0
+    vartorow = new Map()
+    valtorow = new Map()
   })
   return blocks
 }
