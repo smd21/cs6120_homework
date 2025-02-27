@@ -226,7 +226,6 @@ function set_difference<T>(A: Set<T>, B: Set<T>): Set<T> {
 /// wowie this takes in many things: transfer function, merge function, list of blocks in fn, 
 // cfg of blocks to predecessors, cfg of blocks to successors, the bril function, and a boolean indicating analysis direction
 function generic_workflow(transfer_fn: (b: Block, inp: Set<string>) => Set<string>, merge: (acc: Set<string>, curr: number) => Set<string>, blocks: Block[], cfg_preds: Map<number, number[]>, cfg_succs: Map<number, number[]>, func: Function, backwards: boolean) {
-
   // worklist algorithm pseudocode:
   // in[entry] = init 
   //out[*] = init
