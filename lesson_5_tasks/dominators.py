@@ -133,6 +133,36 @@ def merge_fn(acc:set, p:Block, outputs:dict):
   outs = outputs.get(p)
   return acc.intersection(outs)
 
+def dominance_frontier(block:Block, dominators:dict[Block, set]):
+  frontier = set()
+  dominated = set()
+  # iterate through dominators, find blocks that block dominates
+  for (b, d) in dominators.items():
+    if(block in d):
+      dominated.add(b)
+  
+  # i dont think this is O(n^2) bc of how dominated is set up
+  for(b, d) in dominators.items():
+    if(b in dominated): # skip if directly dominated
+      continue
+    if(len(d.intersection(dominated))): #if child 
+      frontier.add(b)
+  return frontier
+
+def make_tree(dominators:dict[Block, set], cfg:nx.DiGraph):
+  # make tree via deleting edges from CFG if no dominator relationship
+  tree = cfg.copy()
+  to_delete = []
+  for (u, v) in tree.edges():
+    doms = dominators.get(v)
+    if(doms is not None and not(u in dominators.get(v))):
+      to_delete.append((u, v))
+  
+  for (ud, vd) in to_delete:
+    tree.remove_edge(ud, vd)
+  
+  return tree
+
 # begin methods to check stuff
 def check_doms(cfg : nx.DiGraph, dominators:dict[Block, set], entry_node: Block):
   #   if i really cant figure this out use all_simple_paths
@@ -211,6 +241,11 @@ if __name__=="__main__":
       blocks, cfg = get_cfg(func)
       doms:dict[Block, set] = dominators(blocks, cfg)
       check_doms(cfg, doms, blocks[0])
+
+      # check tree output via printing:
+      dom_tree=make_tree(doms, cfg)
+      for (u, v) in dom_tree.edges():
+        print(f"{u} -> {v}")
 
       # check dominators
 
