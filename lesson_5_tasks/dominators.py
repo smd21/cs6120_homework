@@ -145,7 +145,7 @@ def dominance_frontier(block:Block, dominators:dict[Block, set]):
   for(b, d) in dominators.items():
     if(b in dominated): # skip if directly dominated
       continue
-    if(len(d.intersection(dominated))): #if child 
+    if(len(d.intersection(dominated))>0): #if child of something dominated
       frontier.add(b)
   return frontier
 
