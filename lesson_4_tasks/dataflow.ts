@@ -170,7 +170,7 @@ function dataflow(blocks: Block[], cfg_pres: Map<number, number[]>, cfg_sucs: Ma
     var preds: number[] = cfg_pres.get(b_idx)!; //b should def be in the cfg
     //console.log("size: " + (cfg_pres.get(b_idx)!).length);
 
-    // use the intersection to merge
+    // use the union to merge
     var reduction: Set<string> = preds.reduce((acc: Set<string>, curr: number) => new Set([...acc, ...(outputs.get(curr)!)]), new Set()); //acc.union(outputs.get(curr)!)
     //append to current input
     if (inputs.get(b_idx)!.size! > 0) {
