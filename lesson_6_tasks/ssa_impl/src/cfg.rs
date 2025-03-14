@@ -443,7 +443,7 @@ impl FuncContext {
         // call rename
 
         let mut ssa_blocks = self.rename(0, stacks, self.blocks.clone());
-        let mut acc: Vec<InsnType> = Vec::new();
+        ssa_blocks.push(new_block);
         // unblockify
         let mut just_instrs = ssa_blocks
             .iter_mut()
@@ -455,7 +455,7 @@ impl FuncContext {
                 temp
             })
             .collect_vec();
-        let final_instrs = just_instrs.iter_mut().fold(acc, |mut a, el| {
+        let final_instrs = just_instrs.iter_mut().fold(Vec::new(), |mut a, el| {
             a.append(el);
             a
         });
@@ -477,7 +477,7 @@ impl FuncContext {
         // for set instructions: arg0 is changed when calling rename on predecessor
         // set arg1 reads from top of stack at the END of the block it is in
         // get: reads from top of stack (like an arg) in block it is in
-        let mut ssa_block = ssa_blocks.get_mut(block_idx as usize).unwrap();
+        let ssa_block = ssa_blocks.get_mut(block_idx as usize).unwrap();
 
         // do get instructions here before stack is changed - read from top of stack
         ssa_block.get_instrs = ssa_block
@@ -593,6 +593,6 @@ impl FuncContext {
         // adjust set arg0 in successors
         // recurse on children in dominance tree
 
-        return ssa_blocks;
+        ssa_blocks
     }
 }
