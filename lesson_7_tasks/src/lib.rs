@@ -1,5 +1,5 @@
 // SPDX-License: MIT
-use either::{Either, Left, Right};
+//use either::{Either, Left, Right};
 
 use llvm_plugin::{LlvmModulePass, PassBuilder, PipelineParsing, PreservedAnalyses};
 
@@ -28,25 +28,31 @@ impl LlvmModulePass for SkeletonPass {
                 for instr in basic_block.get_instructions() {
                     match instr.get_opcode() {
                         llvm_plugin::inkwell::values::InstructionOpcode::Br => {
-                            let insn_labels = instr.get_operands();
-                            let mapped = insn_labels.into_iter().map(|x| {
-                                let y = x.unwrap().left().unwrap().get_name().to_str();
-                                if let Ok(y_2) = y {
-                                    y_2
-                                } else {
-                                    let new_str = "";
-                                    new_str
-                                }
-                            });
-                            let folded = mapped.fold(String::new(), |acc, el| acc.push_str(el));
-                            println!("tree branch {}", folded);
+                            // let insn_labels = instr.get_operands();
+                            // let mapped = insn_labels.into_iter().map(|x| {
+                            //     let y = x.unwrap().right().unwrap();
+                            //     let name = y.get_name().to_str();
+                            //     if let Ok(y_2) = name {
+                            //         String::from(y_2)
+                            //     } else {
+                            //         String::new()
+                            //     }
+                            // });
+                            // let folded = mapped.fold(String::new(), |mut acc, el| {
+                            //     acc.push_str(el.as_str());
+                            //     acc
+                            // });
+                            println!("tree branch");
                         }
                         llvm_plugin::inkwell::values::InstructionOpcode::Call => {
-                            let first = instr.get_operands().next().unwrap();
-                            let bb = first.unwrap().right().unwrap().get_name().to_str();
-                            if let Ok(b) = bb {
-                                println!("you have called a function: {}", b);
-                            }
+                            // let first = instr.get_operands().next().unwrap();
+                            // let bb = first.unwrap();
+                            // let test = bb.right().unwrap();
+                            // let name = test.get_name().to_str();
+                            // if let Ok(b) = name {
+                            //     println!("you have called a function: {}", b);
+                            // }
+                            println!("you have called a function:");
                         }
                         llvm_plugin::inkwell::values::InstructionOpcode::CallBr => {
                             println!("you have called a function - branch ver");
