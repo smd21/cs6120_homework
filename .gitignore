@@ -1,4 +1,5 @@
 benchmarks/
+core/
 lesson_3_tasks/*.csv
 node_modules/
 .venv/
